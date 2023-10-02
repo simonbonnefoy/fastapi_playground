@@ -40,8 +40,12 @@ class DBApi():
         self.session.delete(user)
         self.session.commit()
 
-    def get_posts_and_users_from_userid(self, uid):
-        results = self.session.query(Post, User).filter(Post.user_id==User.id).filter(User.id==uid).filter(Post.category=='movie').all()
+    def get_posts_and_users_from_userid(self, uid: int):
+        results = self.session.query(Post, User).filter(Post.user_id==User.id).filter(User.id==uid).all()
+        return results
+
+    def get_posts_and_users_from_category(self, category: str):
+        results = self.session.query(Post, User).filter(User.id==Post.user_id).filter(Post.category==category).all()
         return results
 
     def add_user(self, user_schema: UserSchema):
@@ -71,8 +75,3 @@ class DBApi():
     #     return all_posts
     #
 
-# Retrieve entries from User and Post based on filters
-# results = session.query(Post, User).filter(Post.user_id==User.id).filter(User.id == 2).filter(Post.category=='movie').all()
-# for (post, user) in results:
-#     print(post.id)
-#     print(user.id)

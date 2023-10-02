@@ -20,23 +20,27 @@ async def root():
 
 @app.get("/initdb")
 async def root():
+    database.recreate_all_tables()
+
     # Create various users
     user1 = User('user1', 'password', 'user1@fake.com')
     user2 = User('user2', 'password2', 'user2@fake.com')
     user3 = User('user3', 'password3', 'user3@fake.com')
+
+    database.add_user(user1)
+    database.add_user(user2)
+    database.add_user(user3)
 
     post1 = Post(category='computing', text='computing is fun', user_id=user1.id)
     post2 = Post(category='movie', text='Matrix is fun', user_id=user2.id)
     post3 = Post(category='science', text='Science is fun', user_id=user2.id)
     post4 = Post(category='movie', text='Movie is even more fun', user_id=user3.id)
 
-    database.add_user(user1)
-    database.add_user(user2)
-    database.add_user(user3)
     database.add_user(post1)
     database.add_user(post2)
     database.add_user(post3)
     database.add_user(post4)
+
     return {"db init": "OK"}
 
 
@@ -66,7 +70,20 @@ async def get_posts_from_user_id(user_id: int):
     :return: a dict containing the user info
     """
     results = database.get_posts_and_users_from_userid(user_id)
-    return results
+    results_dict = [(user.as_dict(), post.as_dict()) for post, user in results]
+    return results_dict
+
+
+@app.get("/posts_and_users/category/{category}")
+async def get_posts_from_user_id(category: str):
+    """
+
+    :param user_id:
+    :return:
+    """
+    results = database.get_posts_and_users_from_category(category)
+    results_dict = [(user.as_dict(), post.as_dict()) for post, user in results]
+    return results_dict
 
 @app.get("/user/{user_id}")
 async def get_user_by_id(user_id: int):
