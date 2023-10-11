@@ -13,7 +13,15 @@ class User(Base):
     is_active = Column(Boolean, default=True)
 
     items = relationship("Item", back_populates="owner")
+    post = relationship(argument="Post", back_populates="writer")
 
+class Post(Base):
+    __tablename__ = "posts"
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String, index=True)
+    text = Column(String, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    writer = relationship("User", back_populates="post")
 
 class Item(Base):
     __tablename__ = "items"
@@ -22,5 +30,6 @@ class Item(Base):
     title = Column(String, index=True)
     description = Column(String, index=True)
     owner_id = Column(Integer, ForeignKey("users.id"))
+    price = Column(Integer, index=True)
 
     owner = relationship("User", back_populates="items")

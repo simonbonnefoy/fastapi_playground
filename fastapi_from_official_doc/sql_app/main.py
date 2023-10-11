@@ -23,7 +23,8 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db_user = crud.get_user_by_email(db, email=user.email)
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")
-    return crud.create_user(db=db, user=user)
+    db_user = crud.create_user(db=db, user=user)
+    return db_user
 
 
 @app.get("/users/", response_model=list[schemas.User])
@@ -46,6 +47,12 @@ def create_item_for_user(
 ):
     return crud.create_user_item(db=db, item=item, user_id=user_id)
 
+
+@app.post("/users/{user_id}/posts/", response_model=schemas.Post)
+def create_post_for_user(
+        user_id: int, post: schemas.PostCreate, db: Session = Depends(get_db)
+):
+    return crud.create_user_post(db=db, post=post, user_id=user_id)
 
 @app.get("/items/", response_model=list[schemas.Item])
 def read_items(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
